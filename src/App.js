@@ -22,7 +22,7 @@ function Board({xIsNext, squares, onPlay}) {
   } else {
     status = "Next player: " + (xIsNext ? "X" : "O");
   }
-  
+
   return(
     <>
       <div className = "status">{status}</div>
@@ -61,6 +61,11 @@ export default function Game() {
     setCurrentMove(nextMove);
   }
 
+  function restart() {
+    setCurrentMove(0);
+    setHistory([Array(9).fill(null)]);
+  }
+
   const moves = history.map((squares, move) => {
     let description;
     if (move > 0) {
@@ -80,6 +85,9 @@ export default function Game() {
       <header>{"Tic-Tac-Toe"}</header>
       <div className = "game-board">
         <Board xIsNext = {xIsNext} squares = {currentSquares} onPlay = {handlePlay} />
+      </div>
+      <div className = "restart-button">
+        <button onClick = {() => restart()}>{"Restart"}</button>
       </div>
       <div className = "game-info">
         <ol>{moves}</ol>
