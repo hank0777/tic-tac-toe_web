@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 function Board({xIsNext, squares, onPlay}) {
   function handleClick(i) {
-    if (calculateWinner(squares) || squares[i]) {
+    if (isFullBoard(squares) || calculateWinner(squares) || squares[i]) {
       return;
     }
     const nextSquares = squares.slice();
@@ -17,7 +17,9 @@ function Board({xIsNext, squares, onPlay}) {
 
   const winner = calculateWinner(squares);
   let status;
-  if (winner) {
+  if (winner === null && isFullBoard(squares)) {
+    status = "Draw";
+  } else if (winner) {
     status = winner + " wins!";
   } else {
     status = "Next player: " + (xIsNext ? "X" : "O");
@@ -122,4 +124,12 @@ function calculateWinner(squares) {
     }
   }
   return null;
+}
+
+function isFullBoard(squares) {
+  const nullSquares = squares.filter(i => i === null);
+  if (nullSquares.length === 0) {
+    return true;
+  }
+  return false;
 }
