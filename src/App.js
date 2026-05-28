@@ -63,9 +63,16 @@ export default function Game() {
     setCurrentMove(nextMove);
   }
 
-  function restart() {
-    setCurrentMove(0);
-    setHistory([Array(9).fill(null)]);
+  /* -1 is undo, 0 is restart, 1 is redo*/
+  function moveTo(num) {
+    if (num === 0) {
+      setCurrentMove(0);
+      setHistory([Array(9).fill(null)]);
+      return;
+    }
+    if (currentMove + num >= 0 && currentMove + num < history.length) {
+      setCurrentMove(currentMove + num);
+    }
   }
 
   const moves = history.map((squares, move) => {
@@ -85,11 +92,13 @@ export default function Game() {
   return (
     <div className = "game">
       <header>{"Tic-Tac-Toe"}</header>
+      <div className = "move-button">
+        <button onClick = {() => moveTo(0)}>{"Restart"}</button>
+        <button onClick = {() => moveTo(-1)}>{"Undo"}</button>
+        <button onClick = {() => moveTo(1)}>{"Redo"}</button>
+      </div>
       <div className = "game-board">
         <Board xIsNext = {xIsNext} squares = {currentSquares} onPlay = {handlePlay} />
-      </div>
-      <div className = "restart-button">
-        <button onClick = {() => restart()}>{"Restart"}</button>
       </div>
       <div className = "game-info">
         <ol>{moves}</ol>
