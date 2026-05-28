@@ -1,6 +1,8 @@
 import './App.css';
 import { useState } from 'react';
 
+let winningArr = Array(3).fill(null);
+
 function Board({xIsNext, squares, onPlay}) {
   function handleClick(i) {
     if (isFullBoard(squares) || calculateWinner(squares) || squares[i]) {
@@ -21,6 +23,7 @@ function Board({xIsNext, squares, onPlay}) {
     status = "Draw";
   } else if (winner) {
     status = winner + " wins!";
+    /*highlight winning row here? */
   } else {
     status = "Next player: " + (xIsNext ? "X" : "O");
   }
@@ -28,21 +31,20 @@ function Board({xIsNext, squares, onPlay}) {
   return(
     <>
       <div className = "status">{status}</div>
-      <div className = "board-row">
-        <Square value = {squares[0]} onSquareClick = {()=>handleClick(0)} />
-        <Square value = {squares[1]} onSquareClick = {()=>handleClick(1)} />
-        <Square value = {squares[2]} onSquareClick = {()=>handleClick(2)} />
-      </div>
-      <div className = "board-row">
-        <Square value = {squares[3]} onSquareClick = {()=>handleClick(3)} />
-        <Square value = {squares[4]} onSquareClick = {()=>handleClick(4)} />
-        <Square value = {squares[5]} onSquareClick = {()=>handleClick(5)} />
-      </div>
-      <div className = "board-row">
-        <Square value = {squares[6]} onSquareClick = {()=>handleClick(6)} />
-        <Square value = {squares[7]} onSquareClick = {()=>handleClick(7)} />
-        <Square value = {squares[8]} onSquareClick = {()=>handleClick(8)} />
-      </div>
+      {[0, 1, 2].map(row => {
+        return(
+          <div className = "board-row">
+            {[0, 1, 2].map(col => {
+              let i = 3 * row + col;
+              return(
+                <Square value = {squares[i]} onSquareClick = {()=>handleClick(i)} />
+              );
+            })
+            }
+          </div> 
+        );   
+      })
+      } 
     </>
   );
 }
@@ -63,18 +65,6 @@ export default function Game() {
     setCurrentMove(nextMove);
   }
 
-  /* -1 is undo, 0 is restart, 1 is redo*/
-  function moveTo(num) {
-    if (num === 0) {
-      setCurrentMove(0);
-      setHistory([Array(9).fill(null)]);
-      return;
-    }
-    if (currentMove + num >= 0 && currentMove + num < history.length) {
-      setCurrentMove(currentMove + num);
-    }
-  }
-
   const moves = history.map((squares, move) => {
     let description;
     if (move > 0) {
@@ -88,6 +78,18 @@ export default function Game() {
       </li>
     );
   });
+
+  /* -1 is undo, 0 is restart, 1 is redo*/
+  function moveTo(num) {
+    if (num === 0) {
+      setCurrentMove(0);
+      setHistory([Array(9).fill(null)]);
+      return;
+    }
+    if (currentMove + num >= 0 && currentMove + num < history.length) {
+      setCurrentMove(currentMove + num);
+    }
+  }
 
   return (
     <div className = "game">
@@ -129,6 +131,7 @@ function calculateWinner(squares) {
   for (let i = 0; i < winningRows.length; i++) {
     const [a, b, c] = winningRows[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      winningArr = winningRows[i];
       return squares[a];
     }
   }
