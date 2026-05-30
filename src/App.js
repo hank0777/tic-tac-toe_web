@@ -23,21 +23,20 @@ function Board({xIsNext, squares, onPlay}) {
     status = "Draw";
   } else if (winner) {
     status = winner + " wins!";
-    /*highlight winning row here? */
   } else {
     status = "Next player: " + (xIsNext ? "X" : "O");
   }
 
   return(
     <>
-      <div className = "status">{status}</div>
+      <div className="status">{status}</div>
       {[0, 1, 2].map(row => {
         return(
-          <div className = "board-row">
+          <div className="board-row">
             {[0, 1, 2].map(col => {
               let i = 3 * row + col;
-              return(
-                <Square value = {squares[i]} onSquareClick = {()=>handleClick(i)} />
+              return (
+                <Square id={i} value={squares[i]} isWinning={winningArr.includes(i)} onSquareClick={()=>handleClick(i)} />
               );
             })
             }
@@ -65,7 +64,7 @@ export default function Game() {
     setCurrentMove(nextMove);
   }
 
-  const moves = history.map((squares, move) => {
+  const moves = history.map((squares, move)=>{
     let description;
     if (move > 0) {
       description = "Go to move # " + move;
@@ -73,8 +72,8 @@ export default function Game() {
       description = "Go to game start";
     }
     return (
-      <li key = {move}>
-        <button onClick = {() => jumpTo(move)}>{description}</button>
+      <li key={move}>
+        <button onClick={()=>jumpTo(move)}>{description}</button>
       </li>
     );
   });
@@ -84,34 +83,33 @@ export default function Game() {
     if (num === 0) {
       setCurrentMove(0);
       setHistory([Array(9).fill(null)]);
-      return;
-    }
-    if (currentMove + num >= 0 && currentMove + num < history.length) {
+    } else if (currentMove + num >= 0 && currentMove + num < history.length) {
       setCurrentMove(currentMove + num);
     }
+    winningArr = Array(3).fill(null);
   }
 
   return (
-    <div className = "game">
+    <div className="game">
       <header>{"Tic-Tac-Toe"}</header>
-      <div className = "move-button">
-        <button onClick = {() => moveTo(0)}>{"Restart"}</button>
-        <button onClick = {() => moveTo(-1)}>{"Undo"}</button>
-        <button onClick = {() => moveTo(1)}>{"Redo"}</button>
+      <div className="move-button">
+        <button onClick={()=>moveTo(0)}>{"Restart"}</button>
+        <button onClick={()=>moveTo(-1)}>{"Undo"}</button>
+        <button onClick={()=>moveTo(1)}>{"Redo"}</button>
       </div>
-      <div className = "game-board">
-        <Board xIsNext = {xIsNext} squares = {currentSquares} onPlay = {handlePlay} />
+      <div className="game-board">
+        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
       </div>
-      <div className = "game-info">
+      <div className="game-info">
         <ol>{moves}</ol>
       </div>
     </div>
   );
 }
 
-function Square({value, onSquareClick}) {
+function Square({value, onSquareClick, isWinning}) {
   return (
-    <button className = "square" onClick = {onSquareClick}>
+    <button className={"square" + (isWinning ? " winning" : "")} onClick={onSquareClick}>
       {value}
     </button>
   );
