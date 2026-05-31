@@ -55,7 +55,47 @@ button.square.winning {
 
 header {
   text-align: center;
-  grid-column: 1/4;
+  grid-column: 2;
   grid-row: 1;
   font-size: 2.5rem;
+}
+
+@media (max-width: 700px) {
+  .game {
+    display: grid;
+    grid-template-rows: auto auto auto auto;
+  }
+
+  header {
+    grid-row: 1;
+    font-size: 6vw;
+  }
+
+  .move-button {
+    grid-row: 2;
+  }
+
+  .game-board {
+    grid-row: 3;
+  }
+
+  .game-info {
+    grid-row: 4;
+    grid-column: 2;
+    list-style-position: outside;
+  }
+
+  .square {
+    width: 11vw;
+    height: 11vw;
+    font-size: 9vw;
+  }
+
+  .status {
+    font-size: 5vw;
+  }
+
+  button {
+    font-size: 2.5vw;
+  }
 }
