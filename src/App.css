@@ -31,7 +31,7 @@ button.square.winning {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   grid-template-rows: auto auto auto auto;
-  row-gap: 2rem;
+  gap: 3vw;
 }
 
 .game-board {
@@ -44,7 +44,7 @@ button.square.winning {
   list-style-position: outside;
   grid-column: 3;
   grid-row: 4;
-  font-size: 1rem;
+  font-size: 2vw;
 }
 
 .move-button {
@@ -63,7 +63,6 @@ header {
 /* resizing for smaller screens */
 @media (max-width: 700px) {
   .game {
-    display: grid;
     grid-template-rows: auto auto auto auto auto;
   }
 
