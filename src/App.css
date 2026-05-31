@@ -9,14 +9,14 @@ button {
   font-weight: bolder;
   border-color: rgb(90, 145, 98);
   margin: 0%;
-  font-size: 3vw;
+  font-size: 2vw;
 }
 
 .square {
-  width: 11vw;
-  height: 11vw;
+  width: 9vw;
+  height: 9vw;
   vertical-align: middle;
-  font-size: 9vw;
+  font-size: 7vw;
 }
 
 button.square.winning {
@@ -24,7 +24,7 @@ button.square.winning {
 }
 
 .status {
-  font-size: 5vw;
+  font-size: 3.5vw;
 }
 
 .game {
@@ -57,9 +57,10 @@ header {
   text-align: center;
   grid-column: 2;
   grid-row: 2;
-  font-size: 7vw;
+  font-size: 5vw;
 }
 
+/* resizing for smaller screens */
 @media (max-width: 700px) {
   .game {
     display: grid;
