@@ -62,6 +62,7 @@ export default function Game() {
 
   function jumpTo(nextMove) {
     setCurrentMove(nextMove);
+    winningArr = Array(3).fill(null);
   }
 
   const moves = history.map((squares, move)=>{
