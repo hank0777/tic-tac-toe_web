@@ -104,5 +104,6 @@ header {
     grid-row: 5;
     grid-column: 1;
     list-style-position: inside;
+    font-size: 4.5vw;
   }
 }
