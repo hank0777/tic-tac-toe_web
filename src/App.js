@@ -56,25 +56,52 @@ function Board({xIsNext, squares, onPlay}) {
   );
 }
 
-function MultiPlayerButtons({isOnePlayer, onMultiPlayerClick}) {
+function MultiPlayerButtons({isOnePlayerClicked, onMultiPlayerClick}) {
   return (
     <div className="player-number-row">
-      <button className={"player-number" + (isOnePlayer ? " clicked" : "")} onClick={()=>onMultiPlayerClick(true)}>{"One player"}</button>
-      <button className={"player-number" + (isOnePlayer ? "" : " clicked")} onClick={()=>onMultiPlayerClick(false)}>{"Two players"}</button>
+      <button className={"player-number" + (isOnePlayerClicked ? " clicked" : "")} onClick={()=>onMultiPlayerClick(true)}>{"One player"}</button>
+      <button className={"player-number" + (isOnePlayerClicked ? "" : " clicked")} onClick={()=>onMultiPlayerClick(false)}>{"Two players"}</button>
+    </div>
+  );
+}
+
+function LevelButtons({difficultyLevel, onLevelButtonsClick}) {
+  return (
+    <div className="level-buttons">
+      <button className={"difficulty-level" + (difficultyLevel===1 ? " clicked" : "")} onClick={()=>onLevelButtonsClick(1)}>{"Easy"}</button>
+      <button className={"difficulty-level" + (difficultyLevel===2 ? " clicked" : "")} onClick={()=>onLevelButtonsClick(2)}>{"Medium"}</button>
+      <button className={"difficulty-level" + (difficultyLevel===3 ? " clicked" : "")} onClick={()=>onLevelButtonsClick(3)}>{"Hard"}</button>
     </div>
   );
 }
 
 function MultiPlayer() {
   const [isOnePlayerClicked, setIsOnePlayerClicked] = useState(true);
+  const [difficultyLevel, setDifficultyLevel] = useState(1);
 
-  function handleClick(value) {
+  function handleMultiPlayerClick(value) {
     setIsOnePlayerClicked(value);
-    console.log("clicked. now isOnePlayerClicked is " + value);
+  }
+
+  function handleLevelButtonsClick(value) {
+    setDifficultyLevel(value);
+  }
+  
+  if (isOnePlayerClicked) {
+    return (
+      <>
+        <MultiPlayerButtons isOnePlayerClicked={isOnePlayerClicked} onMultiPlayerClick={handleMultiPlayerClick} />
+        <div className="level-buttons">
+          <LevelButtons difficultyLevel={difficultyLevel} onLevelButtonsClick={handleLevelButtonsClick} />
+        </div>
+      </>
+    );
   }
 
   return (
-    <MultiPlayerButtons isOnePlayer={isOnePlayerClicked} onMultiPlayerClick={handleClick} />
+    <>
+      <MultiPlayerButtons isOnePlayer={isOnePlayerClicked} onMultiPlayerClick={handleMultiPlayerClick} />
+    </>
   );
 }
 

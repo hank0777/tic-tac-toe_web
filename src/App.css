@@ -30,6 +30,7 @@ header {
 .select-player-number {
   grid-row: 3;
   grid-column: 2;
+  text-align: center;
 }
 
 .move-button {
@@ -62,11 +63,11 @@ button.square.winning {
   background-color: rgb(235, 213, 230);
 }
 
-.player-number {
+.player-number, .difficulty-level {
   color: rgb(105, 105, 108);
 }
 
-button.player-number.clicked {
+button.player-number.clicked, button.difficulty-level.clicked {
   background-color: rgb(199, 196, 200);
 }
 
