@@ -3,6 +3,14 @@ import { useState } from 'react';
 
 let winningArr = Array(3).fill(null);
 
+function Square({value, onSquareClick, isWinning}) {
+  return (
+    <button className={"square" + (isWinning ? " winning" : "")} onClick={onSquareClick}>
+      {value}
+    </button>
+  );
+}
+
 function Board({xIsNext, squares, onPlay}) {
   function handleClick(i) {
     if (isFullBoard(squares) || calculateWinner(squares) || squares[i]) {
@@ -32,11 +40,11 @@ function Board({xIsNext, squares, onPlay}) {
       <div className="status">{status}</div>
       {[0, 1, 2].map(row => {
         return(
-          <div className="board-row">
+          <div className="board-row" key={row}>
             {[0, 1, 2].map(col => {
               let i = 3 * row + col;
               return (
-                <Square id={i} value={squares[i]} isWinning={winningArr.includes(i)} onSquareClick={()=>handleClick(i)} />
+                <Square key={i} id={i} value={squares[i]} isWinning={winningArr.includes(i)} onSquareClick={()=>handleClick(i)} />
               );
             })
             }
@@ -45,6 +53,28 @@ function Board({xIsNext, squares, onPlay}) {
       })
       } 
     </>
+  );
+}
+
+function MultiPlayerButtons({isOnePlayer, onMultiPlayerClick}) {
+  return (
+    <div className="player-number-row">
+      <button className={"player-number" + (isOnePlayer ? " clicked" : "")} onClick={()=>onMultiPlayerClick(true)}>{"One player"}</button>
+      <button className={"player-number" + (isOnePlayer ? "" : " clicked")} onClick={()=>onMultiPlayerClick(false)}>{"Two players"}</button>
+    </div>
+  );
+}
+
+function MultiPlayer() {
+  const [isOnePlayerClicked, setIsOnePlayerClicked] = useState(true);
+
+  function handleClick(value) {
+    setIsOnePlayerClicked(value);
+    console.log("clicked. now isOnePlayerClicked is " + value);
+  }
+
+  return (
+    <MultiPlayerButtons isOnePlayer={isOnePlayerClicked} onMultiPlayerClick={handleClick} />
   );
 }
 
@@ -93,6 +123,9 @@ export default function Game() {
   return (
     <div className="game">
       <header>{"Tic-Tac-Toe"}</header>
+      <div className="select-player-number">
+        <MultiPlayer />
+      </div>
       <div className="move-button">
         <button onClick={()=>moveTo(0)}>{"Restart"}</button>
         <button onClick={()=>moveTo(-1)}>{"Undo"}</button>
@@ -108,14 +141,7 @@ export default function Game() {
   );
 }
 
-function Square({value, onSquareClick, isWinning}) {
-  return (
-    <button className={"square" + (isWinning ? " winning" : "")} onClick={onSquareClick}>
-      {value}
-    </button>
-  );
-}
-
+/* helper functions */
 function calculateWinner(squares) {
   const winningRows = [
     [0, 1, 2],    // horizontal rows
