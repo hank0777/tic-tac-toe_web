@@ -152,7 +152,7 @@ export default function Game() {
   }
 
   const winner = calculateWinner(currentSquares);
-  const moves = history.map((currentSquares, move)=>{
+  const moves = history.map((squares, move)=>{
     /* skips button to navigate to computer's move */
     const isLastMove = move === history.length - 1;
     if (isOnePlayerClicked && move % 2 === 1 && !isLastMove) {
@@ -183,6 +183,9 @@ export default function Game() {
 
   /* -1 is undo, 0 is restart, 1 is redo */
   function moveTo(num) {
+    if (isOnePlayerClicked && winner === null && !xIsNext) {
+      return null;
+    }
     if (num === 0) {
       setCurrentMove(0);
       setHistory([Array(9).fill(null)]);
