@@ -151,9 +151,11 @@ export default function Game() {
     winningArr = Array(3).fill(null);
   }
 
-  const moves = history.map((squares, move)=>{
+  const winner = calculateWinner(currentSquares);
+  const moves = history.map((currentSquares, move)=>{
     /* skips button to navigate to computer's move */
-    if (isOnePlayerClicked && move % 2 === 1) {
+    const isLastMove = move === history.length - 1;
+    if (isOnePlayerClicked && move % 2 === 1 && !isLastMove) {
       return null;
     }
 
@@ -173,7 +175,6 @@ export default function Game() {
 
   /* skips computer move when undo/redo clicked */
   let location = 1;
-  const winner = calculateWinner(currentSquares);
   if (isOnePlayerClicked) {
     if (winner === null || winner === "O") {
       location = 2;
