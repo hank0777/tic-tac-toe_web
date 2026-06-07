@@ -217,9 +217,8 @@ export default function Game() {
 }
 
 /* HELPER FUNCTIONS */
-/* finds winning line and updates winningArr */
-function calculateWinner(squares) {
-  const winningRows = [
+
+let winningRows = [
     [0, 1, 2],    // horizontal rows
     [3, 4, 5],
     [6, 7, 8],
@@ -228,7 +227,10 @@ function calculateWinner(squares) {
     [2, 5, 8],
     [0, 4, 8],    // diagonals
     [2, 4, 6]
-  ];
+];
+
+/* finds winning line and updates winningArr */
+function calculateWinner(squares) {
   for (let i = 0; i < winningRows.length; i++) {
     const [a, b, c] = winningRows[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
@@ -259,8 +261,27 @@ function isEmptyBoard(squares) {
 
 /* COMPUTER MOVE LOGIC */
 function computerMove(squares, difficultyLevel){
-  /* random move */
+  /* returns winning move if possible */
+  function makeWinningMove(squares) {
+    for (let i = 0; i < winningRows.length; i++) {
+      const [a, b, c] = winningRows[i];
+      if (squares[a] === "O" && squares[a] === squares[b] && !squares[c]) {
+        return c;
+      } else if (squares[a]  === "O" && squares[a] === squares[c] && !squares[b]) {
+        return b;
+      } else if (!squares[a] && squares[b] === "O" && squares[b] === squares[c]) {
+        return a;
+      }
+    }
+    return null;
+  }
+
+  /* returns random move unless the computer can win */
   function makeEasyMove(squares) {
+    let winningMove = makeWinningMove(squares);
+    if (winningMove != null) {
+      return winningMove;
+    }
     let openSquares = [];
     for (let i = 0; i < squares.length; i++) {
       if (!squares[i]) {
@@ -271,8 +292,24 @@ function computerMove(squares, difficultyLevel){
     return openSquares[index];
   }
 
+  /* returns random move unless the computer can win,
+  or there is a line that is one move away from a win */
   function makeMediumMove(squares) {
-
+    let winningMove = makeWinningMove(squares);
+    if (winningMove != null) {
+      return winningMove;
+    }
+    for (let i = 0; i < winningRows.length; i++) {
+      const [a, b, c] = winningRows[i];
+      if (squares[a] && squares[a] === squares[b] && !squares[c]) {
+        return c;
+      } else if (squares[a] && squares[a] === squares[c] && !squares[b]) {
+        return b;
+      } else if (!squares[a] && squares[b] && squares[b] === squares[c]) {
+        return a;
+      }
+    }
+    return makeEasyMove(squares);
   }
 
   function makeHardMove(squares) {
