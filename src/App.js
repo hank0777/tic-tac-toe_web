@@ -129,9 +129,11 @@ export default function Game() {
     setHistory(nextHistory);
     setCurrentMove(nextHistory.length-1);
   }
+  
+  const winner = calculateWinner(currentSquares);
 
   function handleMultiPlayerClick(value) {
-    if (!isEmptyBoard(currentSquares) && calculateWinner(currentSquares) === null) {
+    if (winner === null && !isEmptyBoard(currentSquares) && !isFullBoard(currentSquares)) {
       return null;
     }
     moveTo(0);
@@ -139,7 +141,7 @@ export default function Game() {
   }
 
   function handleLevelButtonsClick(value) {
-    if (!isEmptyBoard(currentSquares) && calculateWinner(currentSquares) === null) {
+    if (winner === null && !isEmptyBoard(currentSquares) && !isFullBoard(currentSquares)) {
       return null;
     }
     moveTo(0);
@@ -151,7 +153,6 @@ export default function Game() {
     winningArr = Array(3).fill(null);
   }
 
-  const winner = calculateWinner(currentSquares);
   const moves = history.map((squares, move)=>{
     /* skips button to navigate to computer's move */
     const isLastMove = move === history.length - 1;
@@ -176,14 +177,14 @@ export default function Game() {
   /* skips computer move when undo/redo clicked */
   let location = 1;
   if (isOnePlayerClicked) {
-    if (winner === null || winner === "O") {
+    if ((winner === null && !isFullBoard(currentSquares)) || winner === "O") {
       location = 2;
     }
   }
 
   /* -1 is undo, 0 is restart, 1 is redo */
   function moveTo(num) {
-    if (isOnePlayerClicked && winner === null && !xIsNext) {
+    if (isOnePlayerClicked && winner === null && !isFullBoard(currentSquares) && !xIsNext) {
       return null;
     }
     if (num === 0) {
