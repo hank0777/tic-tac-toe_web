@@ -13,7 +13,7 @@ function Square({value, onSquareClick, isWinning}) {
 
 /* creates game board and checks for winner */
 function Board({xIsNext, squares, onPlay, isOnePlayer, difficultyLevel}) {
-  const winner = calculateWinner(squares);
+  const winner = calculateWinner(squares, true);
   const fullBoard = isFullBoard(squares);
   
   const playMove = useCallback((i)=>{
@@ -130,10 +130,12 @@ export default function Game() {
     setCurrentMove(nextHistory.length-1);
   }
   
-  const winner = calculateWinner(currentSquares);
+  const winner = calculateWinner(currentSquares, true);
+  const emptyBoard = isEmptyBoard(currentSquares);
+  const fullBoard = isFullBoard(currentSquares);
 
   function handleMultiPlayerClick(value) {
-    if (winner === null && !isEmptyBoard(currentSquares) && !isFullBoard(currentSquares)) {
+    if (winner === null && !emptyBoard && !fullBoard) {
       return null;
     }
     moveTo(0);
@@ -141,7 +143,7 @@ export default function Game() {
   }
 
   function handleLevelButtonsClick(value) {
-    if (winner === null && !isEmptyBoard(currentSquares) && !isFullBoard(currentSquares)) {
+    if (winner === null && !emptyBoard && !fullBoard) {
       return null;
     }
     moveTo(0);
@@ -177,14 +179,14 @@ export default function Game() {
   /* skips computer move when undo/redo clicked */
   let location = 1;
   if (isOnePlayerClicked) {
-    if ((winner === null && !isFullBoard(currentSquares)) || winner === "O") {
+    if ((winner === null && !fullBoard) || winner === "O") {
       location = 2;
     }
   }
 
   /* -1 is undo, 0 is restart, 1 is redo */
   function moveTo(num) {
-    if (isOnePlayerClicked && winner === null && !isFullBoard(currentSquares) && !xIsNext) {
+    if (isOnePlayerClicked && winner === null && !fullBoard && !xIsNext) {
       return null;
     }
     if (num === 0) {
@@ -230,12 +232,14 @@ let winningRows = [
     [2, 4, 6]
 ];
 
-/* finds winning line and updates winningArr */
-function calculateWinner(squares) {
+/* finds winner and updates winningArr with winning line if highlightLine is true*/
+function calculateWinner(squares, highlightLine) {
   for (let i = 0; i < winningRows.length; i++) {
     const [a, b, c] = winningRows[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      winningArr = winningRows[i];
+      if (highlightLine) {
+        winningArr = winningRows[i];
+      }
       return squares[a];
     }
   }
@@ -277,12 +281,8 @@ function computerMove(squares, difficultyLevel){
     return null;
   }
 
-  /* returns random move unless the computer can win */
+  /* returns random move */
   function makeEasyMove(squares) {
-    let winningMove = makeWinningMove(squares);
-    if (winningMove != null) {
-      return winningMove;
-    }
     let openSquares = [];
     for (let i = 0; i < squares.length; i++) {
       if (!squares[i]) {
@@ -293,13 +293,8 @@ function computerMove(squares, difficultyLevel){
     return openSquares[index];
   }
 
-  /* returns random move unless the computer can win,
-  or there is a line that is one move away from a win */
+  /* blocks lines that are one move away from winning */
   function makeMediumMove(squares) {
-    let winningMove = makeWinningMove(squares);
-    if (winningMove != null) {
-      return winningMove;
-    }
     for (let i = 0; i < winningRows.length; i++) {
       const [a, b, c] = winningRows[i];
       if (squares[a] && squares[a] === squares[b] && !squares[c]) {
@@ -310,17 +305,78 @@ function computerMove(squares, difficultyLevel){
         return a;
       }
     }
-    return makeEasyMove(squares);
+    return null;
+  }
+
+  /* returns the value of squares,
+  where isMax === true is the computer's turn */
+  function minimax(squares, depth, isMax) {
+    let newSquares = squares.slice();
+    let winner = calculateWinner(squares, false);
+    if (winner === "X") {
+      return -10 + depth;
+    }
+    if (winner === "O") {
+      return 10 - depth;
+    } 
+    if (isFullBoard(newSquares) && winner === null) {
+      return 0;
+    }
+    
+    if (isMax) {
+      let best = -Infinity;
+      for (let i = 0; i < newSquares.length; i++) {
+        if (!newSquares[i]) {
+          newSquares[i] = "O";
+          best = Math.max(best, minimax(newSquares, depth + 1, !isMax));
+          newSquares[i] = null;
+        }
+      }
+      return best;
+    } else {
+      let best = Infinity;
+      for (let i = 0; i < newSquares.length; i++) {
+        if (!newSquares[i]) {
+          newSquares[i] = "X";
+          best = Math.min(best, minimax(newSquares, depth + 1, !isMax));
+          newSquares[i] = null;
+        }
+      }
+      return best;
+    }
   }
 
   function makeHardMove(squares) {
+    let bestVal = -Infinity;
+    let bestMove = -1;
+    let newSquares = squares.slice();
 
+    for (let i = 0; i < newSquares.length; i++) {
+      if (!newSquares[i]) {
+        newSquares[i] = "O";
+        let moveVal = minimax(newSquares, 0, false);
+        newSquares[i] = null;
+        if (moveVal > bestVal) {
+          bestVal = moveVal;
+          bestMove = i;
+        }
+      }
+    }
+    return bestMove;
   }
-  
+
+  let winningMove = makeWinningMove(squares);
+  if (winningMove != null) {
+    return winningMove;
+  }
   if (difficultyLevel === 1) {
     return makeEasyMove(squares);
   } else if (difficultyLevel === 2) {
-    return makeMediumMove(squares);
+    let mediumMove = makeMediumMove(squares);
+    if (mediumMove != null) {
+      return mediumMove;
+    }
+    return makeEasyMove(squares); /* maybe can move this back into makeMediumMove() */
   } else {
     return makeHardMove(squares);
   }
