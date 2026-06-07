@@ -92,6 +92,7 @@ function LevelButtons({difficultyLevel, onLevelButtonsClick}) {
       <button className={"difficulty-level" + (difficultyLevel===1 ? " clicked" : "")} onClick={()=>onLevelButtonsClick(1)}>{"Easy"}</button>
       <button className={"difficulty-level" + (difficultyLevel===2 ? " clicked" : "")} onClick={()=>onLevelButtonsClick(2)}>{"Medium"}</button>
       <button className={"difficulty-level" + (difficultyLevel===3 ? " clicked" : "")} onClick={()=>onLevelButtonsClick(3)}>{"Hard"}</button>
+      <button className={"difficulty-level" + (difficultyLevel===4 ? " clicked" : "")} onClick={()=>onLevelButtonsClick(4)}>{"Impossible"}</button>
     </div>
   );
 }
@@ -305,7 +306,7 @@ function computerMove(squares, difficultyLevel){
         return a;
       }
     }
-    return null;
+    return makeEasyMove(squares);
   }
 
   /* returns the value of squares,
@@ -346,6 +347,7 @@ function computerMove(squares, difficultyLevel){
     }
   }
 
+  /* finds and returns the move with the best value, from minimax function */
   function makeHardMove(squares) {
     let bestVal = -Infinity;
     let bestMove = -1;
@@ -365,6 +367,20 @@ function computerMove(squares, difficultyLevel){
     return bestMove;
   }
 
+  function makeImpossibleMove(squares) {
+    for (let i = 0; i < winningRows.length; i++) {
+      const [a, b, c] = winningRows[i];
+      if (squares[a] === "O" && squares[a] === squares[b]) {
+        return c;
+      } else if (squares[a]  === "O" && squares[a] === squares[c]) {
+        return b;
+      } else if (squares[b] === "O" && squares[b] === squares[c]) {
+        return a;
+      }
+    }
+    return makeMediumMove(squares);
+  }
+
   let winningMove = makeWinningMove(squares);
   if (winningMove != null) {
     return winningMove;
@@ -372,12 +388,10 @@ function computerMove(squares, difficultyLevel){
   if (difficultyLevel === 1) {
     return makeEasyMove(squares);
   } else if (difficultyLevel === 2) {
-    let mediumMove = makeMediumMove(squares);
-    if (mediumMove != null) {
-      return mediumMove;
-    }
-    return makeEasyMove(squares); /* maybe can move this back into makeMediumMove() */
-  } else {
+    return makeMediumMove(squares);
+  } else if (difficultyLevel === 3) {
     return makeHardMove(squares);
+  } else {
+    return makeImpossibleMove(squares);
   }
 }
