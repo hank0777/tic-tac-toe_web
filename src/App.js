@@ -2,6 +2,7 @@ import './App.css';
 import { useState, useEffect, useCallback } from 'react';
 
 let winningArr = Array(3).fill(null);
+let randomWinningRowIndex = 0; /* for impossible mode */
 
 function Square({value, onSquareClick, isWinning}) {
   return (
@@ -147,6 +148,9 @@ export default function Game() {
     if (winner === null && !emptyBoard && !fullBoard) {
       return null;
     }
+    if (difficultyLevel === 4) {
+      randomWinningRowIndex = Math.floor(Math.random() * 4);
+    }
     moveTo(0);
     setDifficultyLevel(value);
   }
@@ -193,6 +197,7 @@ export default function Game() {
     if (num === 0) {
       setCurrentMove(0);
       setHistory([Array(9).fill(null)]);
+      randomWinningRowIndex = Math.floor(Math.random() * 4);
     } else if (currentMove + num >= 0 && currentMove + num < history.length) {
       setCurrentMove(currentMove + num);
     }
@@ -231,6 +236,14 @@ let winningRows = [
     [2, 5, 8],
     [0, 4, 8],    // diagonals
     [2, 4, 6]
+];
+
+/* winning rows that contain the middle square */
+let middleWins = [
+  [3, 4, 5],
+  [1, 4, 7],
+  [0, 4, 8],
+  [2, 4, 6]
 ];
 
 /* finds winner and updates winningArr with winning line if highlightLine is true*/
@@ -306,7 +319,7 @@ function computerMove(squares, difficultyLevel){
         return a;
       }
     }
-    return makeEasyMove(squares);
+    return null;
   }
 
   /* returns the value of squares,
@@ -367,28 +380,71 @@ function computerMove(squares, difficultyLevel){
     return bestMove;
   }
 
+  /* overrides squares to complete a random winning line
+  or if X has two in a row */
   function makeImpossibleMove(squares) {
+    const [a, b, c] = middleWins[randomWinningRowIndex];
+
+    /* tracking O progress in winning line,
+    checking for potential winning lines by X */
+    let oProgress = 0;
+    let xThreat = null;
+    if (squares[a] === "O") {oProgress++;}
+    if (squares[b] === "O") {oProgress++;}
+    if (squares[c] === "O") {oProgress++;}
+
     for (let i = 0; i < winningRows.length; i++) {
-      const [a, b, c] = winningRows[i];
-      if (squares[a] === "O" && squares[a] === squares[b]) {
-        return c;
-      } else if (squares[a]  === "O" && squares[a] === squares[c]) {
-        return b;
-      } else if (squares[b] === "O" && squares[b] === squares[c]) {
-        return a;
+      const [x, y, z] = winningRows[i];
+      if ((squares[x] === "X" && squares[x] === squares[y]) || (squares[x] === "X" && squares[x] === squares[z]) || (squares[y] === "X" && squares[y] === squares[z])) {
+        xThreat = [x, y, z];
       }
     }
-    return makeMediumMove(squares);
+
+    /* if O can win, complete random winning line */
+    if (oProgress === 2) {
+      if (squares[b] !== "O") {
+        return b;
+      }
+      if (squares[a] !== "O") {
+        return a;
+      } else if (squares[c] !== "O") {
+        return c;
+      }
+    }
+    /* if X can win before O, override a square in X's winning line */
+    if (xThreat != null && oProgress < 2) {
+      for (let i = 0; i < xThreat.length; i++) {
+        if (squares[xThreat[i]] === "X") {
+          return xThreat[i];
+        }
+      }
+    } else {
+      if (squares[b] !== "O") {
+        return b;
+      }
+      if (squares[a] !== "O") {
+        return a;
+      } else if (squares[c] !== "O") {
+        return c;
+      }
+    }
   }
 
+  /* makes winning move if it exists */
   let winningMove = makeWinningMove(squares);
   if (winningMove != null) {
     return winningMove;
   }
+
+  /* making computer move based on difficulty level */
   if (difficultyLevel === 1) {
     return makeEasyMove(squares);
   } else if (difficultyLevel === 2) {
-    return makeMediumMove(squares);
+    let mediumMove = makeMediumMove(squares);
+    if (mediumMove != null) {
+      return mediumMove;
+    }
+    return makeEasyMove(squares);
   } else if (difficultyLevel === 3) {
     return makeHardMove(squares);
   } else {
